@@ -386,19 +386,23 @@
             const app = btn.getAttribute('data-upi');
             const upiId = 'sania96.parween-1@okicici';
             const merchantName = 'Crochet by Sania';
-            const amount = total;
+            const amount = total.toFixed(2); // Format amount with 2 decimals
             const phone = document.getElementById('customerPhone').value;
             const transactionNote = `Order-${phone.slice(-4)}`;
 
-            let upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            // Standard UPI URL format (works for most apps)
+            let upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
 
-            // App-specific URLs
+            // App-specific URLs (some apps use different schemes)
             if (app === 'gpay') {
-                upiUrl = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+                // Google Pay uses tez:// or gpay://
+                upiUrl = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             } else if (app === 'phonepe') {
-                upiUrl = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+                // PhonePe uses phonepe://
+                upiUrl = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             } else if (app === 'paytm') {
-                upiUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+                // Paytm uses paytmmp://
+                upiUrl = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             }
 
             // Store order
@@ -406,10 +410,8 @@
             orders.push(orderData);
             localStorage.setItem('cbs_orders', JSON.stringify(orders));
 
-            // Try to open UPI app
-            const link = document.createElement('a');
-            link.href = upiUrl;
-            link.click();
+            // Try to open UPI app - use window.location for better compatibility
+            window.location.href = upiUrl;
 
             // Show confirmation after delay
             setTimeout(() => {
