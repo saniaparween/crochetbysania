@@ -205,30 +205,47 @@
             <!-- Payment -->
             <div class="checkout-section">
                 <h2>Payment via UPI</h2>
-                <p style="color: var(--muted); font-size: 14px; margin: 0 0 16px;">
-                    Pay using UPI ID: <strong style="color: var(--text);">sania96.parween-1@okicici</strong>
-                </p>
 
-                <div id="qrCodeContainer" style="text-align: center; margin: 20px 0; display: none;">
-                    <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block;">
-                        <canvas id="qrCanvas"></canvas>
+                <div id="paymentInfo" style="display: none; background: rgba(255,255,255,0.08); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--muted); font-size: 14px;">Amount to Pay:</span>
+                        <span style="font-size: 20px; font-weight: 700;" id="displayAmount">₹0</span>
                     </div>
-                    <p style="margin-top: 12px; font-size: 14px; color: var(--muted);">Scan this QR code with any UPI app to pay</p>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--muted); font-size: 14px;">Order ID:</span>
+                        <span style="font-size: 14px; font-weight: 600;" id="displayOrderId">-</span>
+                    </div>
                 </div>
 
-                <button class="pay-btn" id="payBtn">Generate UPI Payment Link</button>
-                <div id="upiOptions" style="display: none; margin-top: 16px;">
-                    <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">Choose your UPI app:</p>
-                    <div style="display: grid; gap: 10px;">
-                        <button class="icon-btn" style="width: 100%; padding: 12px;" data-upi="gpay">Google Pay</button>
-                        <button class="icon-btn" style="width: 100%; padding: 12px;" data-upi="phonepe">PhonePe</button>
-                        <button class="icon-btn" style="width: 100%; padding: 12px;" data-upi="paytm">Paytm</button>
-                        <button class="icon-btn" style="width: 100%; padding: 12px;" data-upi="generic">Other UPI App</button>
+                <button class="pay-btn" id="payBtn">Pay with UPI</button>
+
+                <div id="upiOptions" style="display: none; margin-top: 20px;">
+                    <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px; text-align: center;">
+                        Your UPI app will open automatically.<br>
+                        Complete the payment and take a screenshot.
+                    </p>
+                    <div style="display: grid; gap: 12px;">
+                        <button class="icon-btn" style="width: 100%; padding: 14px; font-size: 15px;" data-upi="generic">
+                            📱 Open UPI App
+                        </button>
+                        <button class="icon-btn" style="width: 100%; padding: 14px; font-size: 15px;" data-upi="gpay">
+                            💰 Google Pay
+                        </button>
+                        <button class="icon-btn" style="width: 100%; padding: 14px; font-size: 15px;" data-upi="phonepe">
+                            📲 PhonePe
+                        </button>
+                        <button class="icon-btn" style="width: 100%; padding: 14px; font-size: 15px;" data-upi="paytm">
+                            💳 Paytm
+                        </button>
                     </div>
+                    <p style="color: var(--muted); font-size: 12px; margin-top: 16px; text-align: center; line-height: 1.5;">
+                        If payment doesn't work, manually pay to:<br>
+                        <strong style="color: var(--text);">sania96.parween-1@okicici</strong>
+                    </p>
                 </div>
 
                 <p style="color: var(--muted); font-size: 13px; margin-top: 16px; text-align: center;">
-                    After payment, please WhatsApp screenshot to <strong style="color: var(--text);">+91-XXXXXXXXXX</strong>
+                    After payment, WhatsApp screenshot to <strong style="color: var(--text);">+91-XXXXXXXXXX</strong>
                 </p>
             </div>
         </div>
@@ -313,33 +330,9 @@
     document.getElementById('orderItems').innerHTML = orderItemsHtml;
     document.getElementById('orderTotal').textContent = currencyINR(total);
 
-    // Simple QR Code generation
-    function generateQRCode(text, canvas) {
-        const size = 200;
-        const qrSize = 29; // 29x29 grid for QR code version 3
-        const moduleSize = Math.floor(size / qrSize);
-
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-
-        // Fill white background
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, size, size);
-
-        // For demo: just show the UPI string as text since generating actual QR is complex
-        ctx.fillStyle = 'black';
-        ctx.font = '10px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('UPI Payment', size/2, size/2 - 20);
-        ctx.fillText(text.substring(0, 30), size/2, size/2);
-        ctx.fillText(text.substring(30, 60), size/2, size/2 + 15);
-        ctx.fillText('(Use QR code generator)', size/2, size/2 + 40);
-    }
-
     let orderData = null;
 
-    // UPI Payment - Show options
+    // Show UPI options
     document.getElementById('payBtn').addEventListener('click', () => {
         const form = document.getElementById('checkoutForm');
         if (!form.checkValidity()) {
@@ -352,77 +345,74 @@
         const email = document.getElementById('customerEmail').value;
         const address = document.getElementById('customerAddress').value;
 
-        const upiId = 'sania96.parween-1@okicici';
-        const merchantName = 'Crochet by Sania';
-        const amount = total;
-        const transactionNote = `Order-${phone.slice(-4)}`;
-
-        // Save order details
+        // Generate order
         orderData = {
             orderId: 'ORD-' + Date.now(),
             timestamp: new Date().toISOString(),
             customer: { name, phone, email, address },
             items: cart,
-            total: amount,
+            total: total,
             paymentMethod: 'UPI',
             status: 'pending',
-            upiId: upiId
+            upiId: 'sania96.parween-1@okicici'
         };
 
-        // Show UPI options
-        document.getElementById('payBtn').style.display = 'none';
-        document.getElementById('upiOptions').style.display = 'block';
+        // Store order
+        const orders = JSON.parse(localStorage.getItem('cbs_orders') || '[]');
+        orders.push(orderData);
+        localStorage.setItem('cbs_orders', JSON.stringify(orders));
 
-        // Generate QR Code (placeholder - use actual QR library for production)
-        const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-        const canvas = document.getElementById('qrCanvas');
-        generateQRCode(upiString, canvas);
-        document.getElementById('qrCodeContainer').style.display = 'block';
+        // Show payment options
+        document.getElementById('payBtn').style.display = 'none';
+        document.getElementById('paymentInfo').style.display = 'block';
+        document.getElementById('upiOptions').style.display = 'block';
+        document.getElementById('displayAmount').textContent = currencyINR(total);
+        document.getElementById('displayOrderId').textContent = orderData.orderId;
     });
 
-    // Handle UPI app selection
+    // Build UPI URL with proper encoding
+    function buildUpiUrl({ pa, pn, am, tn, tr }) {
+        const params = new URLSearchParams();
+        params.set("pa", pa);                // payee VPA
+        params.set("pn", pn);                // payee name
+        params.set("am", String(am));        // amount
+        params.set("cu", "INR");             // currency
+        if (tn) params.set("tn", tn);        // note
+        if (tr) params.set("tr", tr);        // transaction ref (important)
+        return `upi://pay?${params.toString()}`;
+    }
+
+    // Handle UPI payment - standard approach
     document.querySelectorAll('[data-upi]').forEach(btn => {
         btn.addEventListener('click', () => {
-            const app = btn.getAttribute('data-upi');
             const upiId = 'sania96.parween-1@okicici';
             const merchantName = 'Crochet by Sania';
-            const amount = total.toFixed(2); // Format amount with 2 decimals
-            const phone = document.getElementById('customerPhone').value;
-            const transactionNote = `Order-${phone.slice(-4)}`;
+            const amount = total.toFixed(2);
+            const transactionNote = `Order payment`;
+            const tr = orderData?.orderId || `ORD-${Date.now()}`;
 
-            // Standard UPI URL format (works for most apps)
-            let upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            // Build standard UPI URL - works for all apps
+            const upiUrl = buildUpiUrl({
+                pa: upiId,
+                pn: merchantName,
+                am: amount,
+                tn: transactionNote,
+                tr: tr
+            });
 
-            // App-specific URLs (some apps use different schemes)
-            if (app === 'gpay') {
-                // Google Pay uses tez:// or gpay://
-                upiUrl = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            } else if (app === 'phonepe') {
-                // PhonePe uses phonepe://
-                upiUrl = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            } else if (app === 'paytm') {
-                // Paytm uses paytmmp://
-                upiUrl = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-            }
-
-            // Store order
-            const orders = JSON.parse(localStorage.getItem('cbs_orders') || '[]');
-            orders.push(orderData);
-            localStorage.setItem('cbs_orders', JSON.stringify(orders));
-
-            // Try to open UPI app - use window.location for better compatibility
+            // Open UPI app
             window.location.href = upiUrl;
 
             // Show confirmation after delay
             setTimeout(() => {
-                if (confirm('Have you completed the payment?\n\nClick OK if payment is done.\n\nPlease WhatsApp payment screenshot for confirmation.')) {
+                const confirmed = confirm('Have you completed the payment?\n\n✓ Click OK if payment is done\n✗ Click Cancel if you need to try again');
+
+                if (confirmed) {
                     localStorage.removeItem(CART_KEY);
-                    alert('Thank you! Order ID: ' + orderData.orderId + '\n\nWe will contact you shortly to confirm delivery.');
+                    alert('Thank you for your order!\n\nOrder ID: ' + orderData.orderId + '\n\nPlease WhatsApp your payment screenshot for confirmation.');
                     window.location.href = '../index.html';
-                } else {
-                    alert('Please complete the payment and WhatsApp the screenshot.\n\nOrder ID: ' + orderData.orderId);
                 }
-            }, 1500);
+            }, 2000);
         });
     });
 </script>
