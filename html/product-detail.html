@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Details | Crochet by Sania</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/product-pages.css" />
+</head>
+
+<body>
+<div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Category navigation">
+        <div class="sidebar-card">
+            <div class="sidebar-title">Categories</div>
+            <nav class="nav">
+                <a href="../index.html">
+                    <span>Home</span>
+                    <span class="hint">🏠</span>
+                </a>
+                <a href="accessories.html">
+                    <span>Accessories</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="handbags.html">
+                    <span>Handbags</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="flowers.html">
+                    <span>Flowers</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="home-decor.html">
+                    <span>Home decor</span>
+                    <span class="hint">→</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand">
+                    <button class="icon-btn" id="menuBtn" aria-label="Open menu">
+                        ☰
+                    </button>
+                </div>
+
+                <a href="../index.html" class="brand-text">
+                    <h1>Crochet by Sania</h1>
+                </a>
+
+                <div class="top-actions" data-header-right>
+                    <!-- cart button will be injected here -->
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+        <div style="margin-top: 16px;">
+            <span class="tag" id="categoryTag">Product</span>
+        </div>
+        <button class="icon-btn" id="backBtn" aria-label="Go back" style="margin-top: 12px;">
+            ← Back
+        </button>
+        <div class="breadcrumb" id="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>›</span>
+            <a href="#" id="categoryLink">Category</a>
+            <span>›</span>
+            <span id="productName">Product</span>
+        </div>
+
+        <div class="product-container">
+        <!-- Image Slider Section -->
+        <div class="slider-section">
+            <div class="slider-wrap">
+                <div class="main-slider">
+                    <div class="slider-track" id="sliderTrack">
+                        <!-- Slides will be injected here -->
+                    </div>
+                    <button class="slider-btn prev" id="prevSlide">‹</button>
+                    <button class="slider-btn next" id="nextSlide">›</button>
+                </div>
+                <div class="thumbnail-strip" id="thumbnails">
+                    <!-- Thumbnails will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info Section -->
+        <div class="info-section">
+            <div>
+                <h1 class="product-title" id="productTitle">Product Name</h1>
+                <div class="product-meta">
+                    <span class="category-tag" id="categoryName">Category</span>
+                    <span class="product-price" id="productPrice">₹0</span>
+                </div>
+            </div>
+
+            <div class="product-description" id="productDescription">
+                Product description will appear here.
+            </div>
+
+            <div class="features-section" id="featuresSection">
+                <h3 class="features-title">Features</h3>
+                <ul class="features-list" id="featuresList">
+                    <!-- Features will be injected here -->
+                </ul>
+            </div>
+
+            <div class="action-section">
+                <div class="qty-selector">
+                    <button id="qtyDec">−</button>
+                    <input type="text" id="qtyInput" value="1" readonly />
+                    <button id="qtyInc">+</button>
+                </div>
+                <button class="add-to-cart-btn" id="addToCartBtn">Add to Cart</button>
+            </div>
+        </div>
+        </div>
+        </div>
+    </main>
+</div>
+
+<script src="../js/products-data.js"></script>
+<script src="../js/cart.js"></script>
+<script>
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    const menuBtn = document.getElementById('menuBtn');
+    const app = document.querySelector('.app');
+
+    function openSidebar(){
+      sidebar.classList.add('open');
+      backdrop.classList.add('show');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    function closeSidebar(){
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('open');
+      isOpen ? closeSidebar() : openSidebar();
+    });
+
+    backdrop.addEventListener('click', closeSidebar);
+
+    // Close sidebar when clicking a nav link (mobile)
+    document.querySelectorAll('.nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 980px)').matches) closeSidebar();
+      });
+    });
+</script>
+<script>
+    // Get product ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    if (!productId) {
+        window.location.href = 'index.html';
+    }
+
+    // Find product
+    const product = (window.PRODUCTS || []).find(p => p.id === productId);
+
+    if (!product) {
+        alert('Product not found');
+        window.location.href = 'index.html';
+    }
+
+    // Format currency
+    function currencyINR(amount) {
+        return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(amount);
+    }
+
+    // Populate product details
+    document.title = `${product.name} | Crochet by Sania`;
+    document.getElementById('categoryTag').textContent = product.section;
+    document.getElementById('productTitle').textContent = product.name;
+    document.getElementById('categoryName').textContent = `${product.category} › ${product.section}`;
+    document.getElementById('productPrice').textContent = currencyINR(product.price);
+    document.getElementById('productDescription').textContent = product.description || 'Beautiful handcrafted crochet product made with love and care.';
+
+    // Breadcrumb
+    document.getElementById('productName').textContent = product.name;
+    const categoryLink = document.getElementById('categoryLink');
+    categoryLink.textContent = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+    categoryLink.href = `${product.category}.html`;
+
+    // Back button
+    document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = `${product.category}.html`;
+    });
+
+    // Features
+    const featuresList = document.getElementById('featuresList');
+    const features = product.features || ['Handmade with love', 'High quality materials', 'Ready to ship'];
+    featuresList.innerHTML = features.map(f => `<li>${f}</li>`).join('');
+
+    // Image Slider
+    const images = product.images || [product.img];
+    let currentSlide = 0;
+
+    const sliderTrack = document.getElementById('sliderTrack');
+    const thumbnails = document.getElementById('thumbnails');
+
+    // Create slides
+    sliderTrack.innerHTML = images.map(img => `
+        <div class="slide">
+            <img src="${img}" alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1520975958225-45c8c1d2f3b8?auto=format&fit=crop&w=900&q=80'">
+        </div>
+    `).join('');
+
+    // Create thumbnails
+    thumbnails.innerHTML = images.map((img, idx) => `
+        <div class="thumb-item ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+            <img src="${img}" alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1520975958225-45c8c1d2f3b8?auto=format&fit=crop&w=900&q=80'">
+        </div>
+    `).join('');
+
+    function goToSlide(index) {
+        currentSlide = index;
+        sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update active thumbnail
+        document.querySelectorAll('.thumb-item').forEach((thumb, idx) => {
+            thumb.classList.toggle('active', idx === currentSlide);
+        });
+    }
+
+    // Slider controls
+    document.getElementById('prevSlide').addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + images.length) % images.length;
+        goToSlide(currentSlide);
+    });
+
+    document.getElementById('nextSlide').addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % images.length;
+        goToSlide(currentSlide);
+    });
+
+    // Thumbnail clicks
+    document.querySelectorAll('.thumb-item').forEach((thumb, idx) => {
+        thumb.addEventListener('click', () => goToSlide(idx));
+    });
+
+    // Quantity controls
+    let qty = 1;
+    const qtyInput = document.getElementById('qtyInput');
+
+    document.getElementById('qtyDec').addEventListener('click', () => {
+        if (qty > 1) {
+            qty--;
+            qtyInput.value = qty;
+        }
+    });
+
+    document.getElementById('qtyInc').addEventListener('click', () => {
+        qty++;
+        qtyInput.value = qty;
+    });
+
+    // Add to cart
+    document.getElementById('addToCartBtn').addEventListener('click', () => {
+        if (window.CBS && window.CBS.addToCart) {
+            window.CBS.addToCart(productId, qty);
+        } else {
+            alert('Added to cart!');
+        }
+    });
+</script>
+</body>
+</html>

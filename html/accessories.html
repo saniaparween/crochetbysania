@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Accessories | Crochet by Sania</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/product-pages.css" />
+</head>
+
+<body>
+<div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Category navigation">
+        <div class="sidebar-card">
+            <div class="sidebar-title">Categories</div>
+            <nav class="nav">
+                <a href="../index.html">
+                    <span>Home</span>
+                    <span class="hint">🏠</span>
+                </a>
+                <a href="accessories.html" class="active">
+                    <span>Accessories</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="handbags.html">
+                    <span>Handbags</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="flowers.html">
+                    <span>Flowers</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="home-decor.html">
+                    <span>Home decor</span>
+                    <span class="hint">→</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand">
+                    <button class="icon-btn" id="menuBtn" aria-label="Open menu">
+                        ☰
+                    </button>
+                </div>
+
+                <a href="../index.html" class="brand-text">
+                    <h1>Crochet by Sania</h1>
+                </a>
+
+                <div class="top-actions" data-header-right>
+                    <!-- cart button will be injected here -->
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <div style="margin-top: 16px;">
+                <span class="tag">Accessories</span>
+            </div>
+            <section class="section">
+                <h3>Accessories</h3>
+                <p>Browse by section and add items to cart.</p>
+                <div class="section-nav" id="sectionNav"></div>
+            </section>
+
+            <div id="sections"></div>
+        </div>
+    </main>
+</div>
+
+<script src="../js/products-data.js"></script>
+<script src="../js/cart.js"></script>
+<script>
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    const menuBtn = document.getElementById('menuBtn');
+
+    function openSidebar(){
+      sidebar.classList.add('open');
+      backdrop.classList.add('show');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    function closeSidebar(){
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('open');
+      isOpen ? closeSidebar() : openSidebar();
+    });
+
+    backdrop.addEventListener('click', closeSidebar);
+
+    // Close sidebar when clicking a nav link (mobile)
+    document.querySelectorAll('.nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 980px)').matches) closeSidebar();
+      });
+    });
+
+    // Product rendering
+    const category = "accessories";
+    const products = (window.PRODUCTS || []).filter(p => p.category === category);
+
+    const sections = [...new Set(products.map(p => p.section))];
+    const nav = document.getElementById("sectionNav");
+    const container = document.getElementById("sections");
+
+    nav.innerHTML = sections.map(s => `<a class="icon-btn" href="#sec-${cssSafe(s)}">${s}</a>`).join("");
+
+    container.innerHTML = sections.map(sec => {
+      const items = products.filter(p => p.section === sec);
+      return `
+        <section class="section" id="sec-${cssSafe(sec)}">
+          <h3>${sec}</h3>
+          <div class="section-grid">
+            ${items.map(p => cardHTML(p)).join("")}
+          </div>
+        </section>
+      `;
+    }).join("");
+
+    function cardHTML(p){
+      const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(p.price);
+      return `
+        <a href="product-detail.html?id=${p.id}" class="card" style="text-decoration:none; color:inherit; display:block; transition: transform .14s ease;">
+          <img src="${p.img}" alt="${escapeHtml(p.name)}" onerror="this.src='https://images.unsplash.com/photo-1520975958225-45c8c1d2f3b8?auto=format&fit=crop&w=900&q=80'">
+          <div class="cbody">
+            <div style="font-weight:700">${escapeHtml(p.name)}</div>
+            <div class="price-row"><span>${inr}</span><span style="color:rgba(255,255,255,0.7); font-size:12px;">Ready</span></div>
+            <button class="icon-btn add-btn" onclick="event.preventDefault(); event.stopPropagation(); CBS.addToCart('${p.id}', 1)">Add to cart</button>
+          </div>
+        </a>
+      `;
+    }
+
+    function cssSafe(s){ return s.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\-]/g,''); }
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+</script>
+</body>
+</html>
