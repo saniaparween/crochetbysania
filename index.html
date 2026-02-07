@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crochet by Sania</title>
+    <style>
+        :root{
+          --bg: #0b0b0f;
+          --panel: rgba(255,255,255,0.06);
+          --panel2: rgba(255,255,255,0.09);
+          --text: rgba(255,255,255,0.92);
+          --muted: rgba(255,255,255,0.7);
+          --border: rgba(255,255,255,0.12);
+          --shadow: 0 12px 30px rgba(0,0,0,0.35);
+          --radius: 18px;
+          --sidebarW: 280px;
+        }
+
+        *{ box-sizing: border-box; }
+        html, body { height: 100%; }
+        body{
+          margin:0;
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+          background: radial-gradient(1000px 700px at 20% 10%, rgba(255,255,255,0.08), transparent 55%),
+                      radial-gradient(900px 650px at 85% 20%, rgba(255,255,255,0.06), transparent 60%),
+                      var(--bg);
+          color: var(--text);
+        }
+
+        a{ color: inherit; text-decoration: none; }
+
+        /* Layout */
+        .app{
+          display: grid;
+          grid-template-columns: var(--sidebarW) 1fr;
+          min-height: 100vh;
+        }
+
+        /* Header */
+        .topbar{
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          background: linear-gradient(to bottom, rgba(11,11,15,0.92), rgba(11,11,15,0.72));
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--border);
+        }
+        .topbar-inner{
+          display:flex;
+          align-items:center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 16px 18px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .brand{
+          display:flex;
+          align-items: baseline;
+          gap: 10px;
+          letter-spacing: 0.2px;
+        }
+        .brand h1{
+          margin:0;
+          font-size: 20px;
+          font-weight: 700;
+        }
+        .brand .tag{
+          font-size: 13px;
+          color: var(--muted);
+          border: 1px solid var(--border);
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: rgba(255,255,255,0.04);
+        }
+
+        .top-actions{
+          display:flex;
+          align-items:center;
+          gap: 10px;
+        }
+
+        .icon-btn{
+          border: 1px solid var(--border);
+          background: rgba(255,255,255,0.05);
+          color: var(--text);
+          border-radius: 12px;
+          padding: 10px 12px;
+          cursor:pointer;
+          transition: transform .12s ease, background .12s ease;
+        }
+        .icon-btn:hover{ background: rgba(255,255,255,0.08); }
+        .icon-btn:active{ transform: translateY(1px); }
+
+        /* Sidebar */
+        .sidebar{
+          position: sticky;
+          top: 0;
+          height: 100vh;
+          border-right: 1px solid var(--border);
+          background: rgba(255,255,255,0.02);
+          backdrop-filter: blur(14px);
+          padding: 18px;
+        }
+        .sidebar-card{
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: var(--radius);
+          padding: 14px;
+          box-shadow: var(--shadow);
+        }
+        .sidebar-title{
+          font-size: 12px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin: 2px 0 10px;
+        }
+        .nav{
+          display:flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .nav a{
+          display:flex;
+          align-items:center;
+          justify-content: space-between;
+          padding: 12px 12px;
+          border-radius: 14px;
+          border: 1px solid transparent;
+          background: rgba(255,255,255,0.03);
+          transition: background .12s ease, border-color .12s ease;
+        }
+        .nav a:hover{
+          background: rgba(255,255,255,0.06);
+          border-color: rgba(255,255,255,0.12);
+        }
+        .nav a .hint{
+          font-size: 12px;
+          color: var(--muted);
+        }
+
+        /* Main */
+        .main{
+          padding: 0 18px 32px;
+        }
+        .container{
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        /* Carousel */
+        .carousel-wrap{
+          margin-top: 18px;
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 24px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+        }
+        .carousel-head{
+          display:flex;
+          align-items:center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 14px 14px 10px;
+          border-bottom: 1px solid var(--border);
+          background: rgba(255,255,255,0.03);
+        }
+        .carousel-head h2{
+          margin:0;
+          font-size: 14px;
+          font-weight: 650;
+          color: rgba(255,255,255,0.85);
+          letter-spacing: 0.2px;
+        }
+        .carousel-controls{
+          display:flex;
+          gap: 8px;
+        }
+
+        .carousel{
+          display:flex;
+          gap: 12px;
+          padding: 14px;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          scroll-behavior: smooth;
+          -webkit-overflow-scrolling: touch;
+        }
+        .carousel::-webkit-scrollbar{ height: 10px; }
+        .carousel::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.14); border-radius: 999px; }
+        .carousel::-webkit-scrollbar-track{ background: rgba(255,255,255,0.04); }
+
+        .product{
+          flex: 0 0 auto;
+          width: 260px;
+          scroll-snap-align: start;
+          border-radius: 18px;
+          border: 1px solid var(--border);
+          background: rgba(255,255,255,0.04);
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform .14s ease, background .14s ease;
+        }
+        .product:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.06); }
+        .product:active{ transform: translateY(-1px); }
+
+        .thumb{
+          aspect-ratio: 4 / 3;
+          width: 100%;
+          background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          border-bottom: 1px solid var(--border);
+        }
+        .thumb img{
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display:block;
+        }
+        .p-body{
+          padding: 12px 12px 14px;
+        }
+        .p-title{
+          margin:0 0 6px;
+          font-size: 14px;
+          font-weight: 650;
+        }
+        .p-meta{
+          display:flex;
+          align-items:center;
+          justify-content: space-between;
+          gap: 10px;
+          color: var(--muted);
+          font-size: 13px;
+        }
+        .pill{
+          font-size: 12px;
+          color: rgba(255,255,255,0.78);
+          border: 1px solid var(--border);
+          background: rgba(255,255,255,0.04);
+          padding: 6px 10px;
+          border-radius: 999px;
+          white-space: nowrap;
+        }
+
+        /* Section blocks (placeholders for categories) */
+        .section{
+          margin-top: 18px;
+          padding: 16px;
+          border-radius: 24px;
+          border: 1px solid var(--border);
+          background: var(--panel);
+          box-shadow: var(--shadow);
+        }
+        .section h3{
+          margin:0 0 10px;
+          font-size: 16px;
+        }
+        .section p{
+          margin:0;
+          color: var(--muted);
+          line-height: 1.5;
+          font-size: 14px;
+        }
+
+        /* Mobile: sidebar becomes off-canvas */
+        @media (max-width: 980px){
+          .app{ grid-template-columns: 1fr; }
+
+          .sidebar{
+            position: fixed;
+            inset: 0 auto 0 0;
+            width: min(var(--sidebarW), 86vw);
+            transform: translateX(-105%);
+            transition: transform .18s ease;
+            z-index: 30;
+            box-shadow: 20px 0 40px rgba(0,0,0,0.45);
+          }
+          .sidebar.open{ transform: translateX(0); }
+
+          .backdrop{
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+            z-index: 25;
+          }
+          .backdrop.show{
+            opacity: 1;
+            pointer-events: auto;
+          }
+        }
+    </style>
+</head>
+
+<body>
+<div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Category navigation">
+        <div class="sidebar-card">
+            <div class="sidebar-title">Categories</div>
+            <nav class="nav">
+                <a href="#accessories">
+                    <span>Accessories</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="#handbags">
+                    <span>Handbags</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="#flowers">
+                    <span>Flowers</span>
+                    <span class="hint">→</span>
+                </a>
+                <a href="#home-decor">
+                    <span>Home decor</span>
+                    <span class="hint">→</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand">
+                    <h1>Crochet by Sania</h1>
+                    <span class="tag">Ready-to-ship</span>
+                </div>
+
+                <div class="top-actions">
+                    <button class="icon-btn" id="menuBtn" aria-label="Open menu">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Carousel -->
+            <section class="carousel-wrap" aria-label="Featured products">
+                <div class="carousel-head">
+                    <h2>Featured picks</h2>
+                    <div class="carousel-controls">
+                        <button class="icon-btn" id="prevBtn" aria-label="Previous products">←</button>
+                        <button class="icon-btn" id="nextBtn" aria-label="Next products">→</button>
+                    </div>
+                </div>
+
+                <div class="carousel" id="carousel">
+                    <!-- Replace these with your actual products -->
+                    <a class="product" href="#handbags" data-name="Crochet Tote" data-price="₹1499">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1520975958225-45c8c1d2f3b8?auto=format&fit=crop&w=900&q=80" alt="Crochet Tote Bag">
+                        </div>
+                        <div class="p-body">
+                            <p class="p-title">Crochet Tote</p>
+                            <div class="p-meta">
+                                <span class="pill">Handbags</span>
+                                <span>₹1499</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a class="product" href="#accessories" data-name="Keychain Set" data-price="₹299">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1520975693411-6cc0b64d7c3b?auto=format&fit=crop&w=900&q=80" alt="Crochet Keychain Set">
+                        </div>
+                        <div class="p-body">
+                            <p class="p-title">Keychain Set</p>
+                            <div class="p-meta">
+                                <span class="pill">Accessories</span>
+                                <span>₹299</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a class="product" href="#flowers" data-name="Bouquet" data-price="₹899">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1526045478516-99145907023c?auto=format&fit=crop&w=900&q=80" alt="Crochet Flower Bouquet">
+                        </div>
+                        <div class="p-body">
+                            <p class="p-title">Crochet Bouquet</p>
+                            <div class="p-meta">
+                                <span class="pill">Flowers</span>
+                                <span>₹899</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a class="product" href="#home-decor" data-name="Coaster Set" data-price="₹499">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1523419409543-a3c3b2b4d7a5?auto=format&fit=crop&w=900&q=80" alt="Crochet Coaster Set">
+                        </div>
+                        <div class="p-body">
+                            <p class="p-title">Coaster Set</p>
+                            <div class="p-meta">
+                                <span class="pill">Home decor</span>
+                                <span>₹499</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a class="product" href="#handbags" data-name="Mini Sling" data-price="₹1199">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1520975865887-7a1b9f1c1f48?auto=format&fit=crop&w=900&q=80" alt="Crochet Mini Sling Bag">
+                        </div>
+                        <div class="p-body">
+                            <p class="p-title">Mini Sling</p>
+                            <div class="p-meta">
+                                <span class="pill">Handbags</span>
+                                <span>₹1199</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Category sections (placeholders for your content) -->
+            <section class="section" id="accessories">
+                <h3>Accessories</h3>
+                <p>Add your accessories grid here (keychains, scrunchies, bookmarks, etc.).</p>
+            </section>
+
+            <section class="section" id="handbags">
+                <h3>Handbags</h3>
+                <p>Add your handbags grid here (totes, slings, minis, etc.).</p>
+            </section>
+
+            <section class="section" id="flowers">
+                <h3>Flowers</h3>
+                <p>Add your flower products here (bouquets, single stems, decor pieces).</p>
+            </section>
+
+            <section class="section" id="home-decor">
+                <h3>Home decor</h3>
+                <p>Add home decor items here (coasters, wall hangings, baskets, etc.).</p>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    const menuBtn = document.getElementById('menuBtn');
+
+    function openSidebar(){
+      sidebar.classList.add('open');
+      backdrop.classList.add('show');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    function closeSidebar(){
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('open');
+      isOpen ? closeSidebar() : openSidebar();
+    });
+
+    backdrop.addEventListener('click', closeSidebar);
+
+    // Close sidebar when clicking a nav link (mobile)
+    document.querySelectorAll('.nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 980px)').matches) closeSidebar();
+      });
+    });
+
+    // Carousel controls
+    const carousel = document.getElementById('carousel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function scrollByCard(direction){
+      const card = carousel.querySelector('.product');
+      const step = card ? (card.getBoundingClientRect().width + 12) : 280;
+      carousel.scrollBy({ left: direction * step, behavior: 'smooth' });
+    }
+
+    prevBtn.addEventListener('click', () => scrollByCard(-1));
+    nextBtn.addEventListener('click', () => scrollByCard(1));
+</script>
+</body>
+</html>
